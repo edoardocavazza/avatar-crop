@@ -5,6 +5,7 @@
   "main": "dist/avatar-crop.js",
   "author": "Edoardo Cavazza <edoardo.cavazza@chialab.it>",
   "license": "MIT",
+  "keywords": ["avatar", "canvas", "image", "filter", "jquery", "angular"],
   "repository": {
     "type": "git",
     "url": "https://github.com/edoardocavazza/avatar-crop.git"

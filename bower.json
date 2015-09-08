@@ -1,0 +1,22 @@
+{
+  "name": "avatar-crop",
+  "version": "0.0.1",
+  "authors": [
+    "Edoardo Cavazza <edoardo.cavazza@chialab.it>"
+  ],
+  "description": "Upload, crop and filter your avatar!",
+  "main": "dist/avatar-crop.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edoardocavazza/avatar-crop.git"
+  },
+  "ignore": [
+    "**/.*",
+    "Gruntfile.js",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

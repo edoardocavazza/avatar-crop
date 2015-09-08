@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Demo Avatar Crop</title>
+		<link href='https://fonts.googleapis.com/css?family=Damion' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="style.css" charset="utf-8">
+		<script type="text/javascript" src="../src/avatar-crop.js"></script>
+		<script type="text/javascript" src="../src/avatar-filters.js"></script>
+		<script type="text/javascript" src="../src/filters/greyscale.js"></script>
+		<script type="text/javascript" src="../src/filters/blur.js"></script>
+		<script type="text/javascript" src="../src/filters/negative.js"></script>
+		<script type="text/javascript" src="../src/filters/sepia.js"></script>
+		<script type="text/javascript" src="../src/filters/vignette.js"></script>
+	</head>
+	<body>
+		<h1>Avatar Crop</h1>
+		<div class="main">
+			<h3>Drag &amp; drop or click!</h3>
+			<div class="holder" style="float: left;"></div>
+			<input type="button" tabindex="1" name="fill" value="fill" onclick="avatar.fill()"><br>
+			<input type="button" tabindex="1" name="fit" value="fit" onclick="avatar.fit()"><br>
+			<input type="button" tabindex="1" name="center" value="center" onclick="avatar.center()"><br>
+			<input type="button" tabindex="1" name="clear" value="clear" onclick="avatar.clear()">
+		</div>
+		<div class="filters">
+			<h3>Apply a filter!</h3>
+			<div class="filter" tabindex="2" aria-label="greyscale" onclick="toggleFilter('greyscale')">
+				<div class="filter-holder" data-filter="greyscale"></div>
+				<label for="greyscale">Greyscale</label>
+			</div>
+			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('blur', { radius: avatar.canvas.width / 16 })">
+				<div class="filter-holder" data-filter="blur"></div>
+				<label for="blur">Blur</label>
+			</div>
+			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('negative')">
+				<div class="filter-holder" data-filter="negative"></div>
+				<label for="negative">Negative</label>
+			</div>
+			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('sepia')">
+				<div class="filter-holder" data-filter="sepia"></div>
+				<label for="sepia">Sepia</label>
+			</div>
+			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('vignette')">
+				<div class="filter-holder" data-filter="vignette"></div>
+				<label for="vignette">Vignette</label>
+			</div>
+		</div>
+		<div class="main">
+			<h3>Save or use!</h3>
+			<a id="export" data-download="awesome-avatar.png">
+				<img />
+			</a>
+		</div>
+		<script type="text/javascript">
+			var avatar = new AvatarCrop( document.querySelector('.holder') ),
+					link = document.getElementById('export'),
+					img = link.firstElementChild;
+
+			function toggleFilter(name, conf) {
+				if (avatar.data) {
+					if (avatar.hasFilter(name)) {
+						avatar.removeFilter(name);
+					} else {
+						avatar.addFilter(name, conf);
+					}
+				}
+			}
+
+			var filters = document.querySelectorAll('.filter-holder'),
+				filterAvatars = [];
+
+			for (var i = 0, len = filters.length; i < len; i++) {
+				filterAvatars[i] = new AvatarCrop(filters[i], {
+					width: 128,
+					height: 128,
+					message: '',
+					interactive: false,
+					selectable: false,
+					droppable: false
+				});
+			}
+
+			var updateTimeout = null;
+
+			function updateFilters() {
+				var data = avatar.save();
+				for (var i = 0, len = filters.length; i < len; i++) {
+					var f = filters[i],
+						name = f.getAttribute('data-filter'),
+						av = filterAvatars[i],
+						ctx = av.canvas.getContext('2d');
+					if (data) {
+						av.setSource(data);
+						if (!avatar.hasFilter(name)) {
+							av.addFilter(name);
+							f.classList.remove('active');
+						} else {
+							f.classList.add('active');
+						}
+					} else {
+						av.clear();
+					}
+				}
+				if (data) {
+					img.src = data;
+					link.href = data;
+					link.setAttribute('download', link.getAttribute('data-download'));
+				} else {
+					img.removeAttribute('src');
+					link.removeAttribute('href');
+					link.removeAttribute('download');
+				}
+			}
+
+			avatar.addEventListener('change', updateFilters);
+			avatar.addEventListener('clear', updateFilters);
+		</script>
+	</body>
+</html>

@@ -1,6 +1,8 @@
 # Avatar Crop
 
-Avatar Crop is a tiny and hackable library for avatar upload & crop based on Canvas and FileReader API.
+Avatar Crop is a tiny and hackable library for avatar upload & crop based on Canvas and FileReader APIs.
+
+[Demo](http://edoardocavazza.github.io/avatar-crop/)
 
 **Main features**
 

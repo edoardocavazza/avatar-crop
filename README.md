@@ -14,3 +14,15 @@ Avatar Crop is a tiny and hackable library for avatar upload & crop based on Can
 * `AvatarCrop.execFilter` out of the box for image adjustments
 * Common filters
 * jQuery plugin and Angular directive
+
+**Install**
+
+Via bower:
+
+	bower install avatar-crop --save
+	
+Via npm:
+
+	npm install avatar-crop --save
+	
+Or [download here](https://github.com/edoardocavazza/avatar-crop/archive/master.zip).

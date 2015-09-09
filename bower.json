@@ -5,7 +5,7 @@
     "Edoardo Cavazza <edoardo.cavazza@chialab.it>"
   ],
   "description": "Upload, crop and filter your avatar!",
-  "main": "dist/avatar-crop.js",
+  "main": "dist/avatar-crop.min.js",
   "license": "MIT",
   "keywords": ["avatar", "canvas", "image", "filter", "jquery", "angular"],
   "repository": {

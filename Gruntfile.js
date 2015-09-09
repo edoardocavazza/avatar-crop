@@ -18,12 +18,8 @@ grunt.initConfig({
       sourceMap: true
     },
     main: {
-      src: ['src/avatar-crop.js'],
+      src: ['src/avatar-crop.js', 'src/avatar-filters.js'],
       dest: 'dist/avatar-crop.js',
-    },
-    filters: {
-      src: ['src/avatar-filters.js', 'src/filters/*.js'],
-      dest: 'dist/avatar-filters.js',
     },
     full: {
       src: ['src/avatar-crop.js', 'src/avatar-filters.js', 'src/filters/*.js'],
@@ -36,12 +32,11 @@ grunt.initConfig({
     },
     dist: {
       files: {
-        'dist/avatar-crop.min.js': ['src/avatar-crop.js'],
-        'dist/avatar-filters.min.js': ['src/avatar-filters.js', 'src/filters/*.js'],
+        'dist/avatar-crop.min.js': ['src/avatar-crop.js', 'src/avatar-filters.js'],
         'dist/avatar-crop.full.min.js': ['src/avatar-crop.js', 'src/avatar-filters.js', 'src/filters/*.js'],
       }
     }
   }
 });
 
-grunt.task.registerTask('build', ['clean:dist', 'concat:main', 'concat:filters', 'concat:full', 'uglify:dist', 'copy:dist']);
+grunt.task.registerTask('build', ['clean:dist', 'concat:main', 'concat:full', 'uglify:dist', 'copy:dist']);

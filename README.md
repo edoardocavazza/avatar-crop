@@ -20,9 +20,13 @@ Avatar Crop is a tiny and hackable library for avatar upload & crop based on Can
 Via bower:
 
 	bower install avatar-crop --save
-	
+
 Via npm:
 
 	npm install avatar-crop --save
-	
+
 Or [download here](https://github.com/edoardocavazza/avatar-crop/archive/master.zip).
+
+**References**
+
+Filter builder and filters inspired (almost copied) from [jQuery filter.me](https://github.com/MatthewRuddy/jQuery-filter.me)

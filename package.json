@@ -1,6 +1,6 @@
 {
   "name": "avatar-crop",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Upload, crop and filter your avatar!",
   "main": "dist/avatar-crop.js",
   "author": "Edoardo Cavazza <edoardo.cavazza@chialab.it>",

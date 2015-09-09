@@ -140,11 +140,26 @@
         ctx = canvas.getContext('2d'),
         canMouseX = 0,
         canMouseY = 0,
+        time = 0,
+        pinchCenter = { x: 0, y: 0 },
         wheel = 0,
+        isTouch = false,
+        pinching = false,
         isDragging = false;
 
     function handleMouseDown(e) {
       if (self.data) {
+        if (e.type == 'touchstart') {
+          if (e.timeStamp - time < 250) {
+            return handleDblClick(e);
+          }
+          time = e.timeStamp;
+          isTouch = true;
+          if (e.touches && e.touches.length) {
+            pinching = (e.touches.length == 2);
+            e = e.touches[0];
+          }
+        }
         canMouseX = e.clientX + self._offsetX;
         canMouseY = e.clientY + self._offsetY;
         isDragging = true;
@@ -153,17 +168,28 @@
 
     function handleMouseUp(e) {
       isDragging = false;
+      isTouch = false;
+      pinching = false;
     }
 
     function handleMouseMove(e) {
-      if (isDragging) {
-        self.move(e.clientX - canMouseX, e.clientY - canMouseY, 1);
+      if (isDragging && isTouch == !!e.type.match('touch')) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (pinching && e.changedTouches && e.changedTouches.length == 2 && typeof e.scale !== 'undefined') {
+          self.zoom(e.scale);
+        } else {
+          pinching = false;
+          if (e.changedTouches && e.changedTouches.length) {
+            e = e.changedTouches[0];
+          }
+          self.move(e.clientX - canMouseX, e.clientY - canMouseY, 1);
+        }
       }
     }
 
     function handleMouseWheel(e) {
-      if (self.data) {
-        if (isDragging) return true;
+      if (self.data && isDragging && isTouch == !!e.type.match('touch')) {
         e.stopPropagation();
         e.preventDefault();
         var delta = -(e.detail ? e.detail * (-120) : e.wheelDelta) / AvatarCrop.DEFAULT_WHEEL_FACTOR;
@@ -179,21 +205,25 @@
         e.preventDefault();
         if (self._zoom == 1) {
           if (self._offsetX == 0 && self._offsetY == 0) {
-            self.fill();
+            self.fill().render();
           } else {
-            self.center();
+            self.center().render();
           }
         } else {
-          self.fit();
+          self.fit().render();
         }
         return false;
       }
     }
 
     bind(canvas, 'mousedown', handleMouseDown);
+    bind(canvas, 'touchstart', handleMouseDown);
     bind(canvas, 'mousemove', handleMouseMove);
+    bind(canvas, 'touchmove', handleMouseMove);
     bind(canvas, 'mouseup', handleMouseUp);
+    bind(canvas, 'touchend', handleMouseUp);
     bind(canvas, 'mouseout', handleMouseUp);
+    bind(canvas, 'touchcancel', handleMouseUp);
     bind(canvas, 'dblclick', handleDblClick);
     bind(canvas, 'mousewheel', handleMouseWheel);
     bind(canvas, 'DOMMouseScroll', handleMouseWheel);
@@ -284,22 +314,22 @@
       canvas.style.cursor = 'progress';
       var draw = function() {
         myRequestAnimFrame(function() {
-          var rotation = parseInt(((new Date() - start) / 1000) * lines) / lines;
-          context.save();
-          context.clearRect(0, 0, cW, cH);
-          context.translate(cW / 2, cH / 2);
-          context.rotate(Math.PI * 2 * rotation);
-          for (var i = 0; i < lines; i++) {
-            context.beginPath();
-            context.rotate(Math.PI * 2 / lines);
-            context.moveTo(cW / 10, 0);
-            context.lineTo(cW / 4, 0);
-            context.lineWidth = cW / 30;
-            context.strokeStyle = "rgba(0, 0, 0," + i / lines + ")";
-            context.stroke();
-          }
-          context.restore();
           if (self._loading) {
+            var rotation = parseInt(((new Date() - start) / 1000) * lines) / lines;
+            context.save();
+            context.clearRect(0, 0, cW, cH);
+            context.translate(cW / 2, cH / 2);
+            context.rotate(Math.PI * 2 * rotation);
+            for (var i = 0; i < lines; i++) {
+              context.beginPath();
+              context.rotate(Math.PI * 2 / lines);
+              context.moveTo(cW / 10, 0);
+              context.lineTo(cW / 4, 0);
+              context.lineWidth = cW / 30;
+              context.strokeStyle = "rgba(0, 0, 0," + i / lines + ")";
+              context.stroke();
+            }
+            context.restore();
             draw();
           }
         });
@@ -339,7 +369,7 @@
       self.fire('load');
       self.setLoadState(false);
       self.data = image;
-      self.reset();
+      self.reset(0).render();
       if (self.options.interactive) {
         canvas.style.cursor = 'move';
       } else {
@@ -353,7 +383,7 @@
   }
 
   proto.fit = function(durate) {
-    return this.moveAndZoom(0, 0, 1, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
+    return this.moveAndZoom(0, 0, 1, (typeof durate !== 'undefined') ? durate : AvatarCrop.DEFAULT_ANIM_DURATE);
   }
 
   proto.fill = function(durate) {
@@ -362,9 +392,9 @@
         imageW = image.width,
         imageH = image.height;
       if (imageH > imageW) {
-        this.moveAndZoom(0, 0, imageH / imageW, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
+        this.moveAndZoom(0, 0, imageH / imageW, (typeof durate !== 'undefined') ? durate : AvatarCrop.DEFAULT_ANIM_DURATE);
       } else {
-        this.moveAndZoom(0, 0, imageW / imageH, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
+        this.moveAndZoom(0, 0, imageW / imageH, (typeof durate !== 'undefined') ? durate : AvatarCrop.DEFAULT_ANIM_DURATE);
       }
     }
     return this;
@@ -403,7 +433,7 @@
         self._offsetY = yTmp;
         self._zoom = zoomTmp;
         if (durate) {
-            self.render();
+          self.render();
         }
       }
 
@@ -439,7 +469,7 @@
   }
 
   proto.center = function(durate) {
-    return this.moveAndZoom(0, 0, this._zoom, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
+    return this.moveAndZoom(0, 0, this._zoom, (typeof durate !== 'undefined') ? durate : AvatarCrop.DEFAULT_ANIM_DURATE);
   }
 
   proto.clear = function() {

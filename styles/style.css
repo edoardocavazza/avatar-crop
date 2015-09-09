@@ -16,6 +16,8 @@ h1 {
 	text-align: center;
 	font-size: 5em;
 	color: #F28B66;
+	line-height: 1em;
+	margin: 0;
 }
 
 h3 {
@@ -45,9 +47,13 @@ input[type="button"]:active {
 	top:1px;
 }
 
-.main, .filters {
+.github-button {
+	display: none;
+}
+
+.sections {
 	margin: 0 auto 0.5em auto;
-	width: 432px;
+	width: 900px;
 	max-width: 100%;
 	position: relative;
 	clear: both;

@@ -8,16 +8,24 @@
 		<script type="text/javascript" src="dist/avatar-crop.full.min.js"></script>
 	</head>
 	<body>
-		<h1>Avatar Crop</h1>
-		<div class="main">
+		<section class="sections">
+			<h1>Avatar Crop<br>
+				<a class="github-button" href="https://github.com/edoardocavazza/avatar-crop" data-icon="octicon-star" data-style="mega" data-count-href="/edoardocavazza/avatar-crop/stargazers" data-count-api="/repos/edoardocavazza/avatar-crop#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star edoardocavazza/avatar-crop on GitHub">Star</a>
+				<a class="github-button" href="https://github.com/edoardocavazza/avatar-crop/fork" data-icon="octicon-repo-forked" data-style="mega" data-count-href="/edoardocavazza/avatar-crop/network" data-count-api="/repos/edoardocavazza/avatar-crop#forks_count" data-count-aria-label="# forks on GitHub" aria-label="Fork edoardocavazza/avatar-crop on GitHub">Fork</a>
+				<a class="github-button" href="https://github.com/edoardocavazza/avatar-crop/archive/master.zip" data-icon="octicon-cloud-download" data-style="mega" aria-label="Download edoardocavazza/avatar-crop on GitHub">Download</a>
+			</h1>
+		</section>
+		<section class="sections">
 			<h3>Drag &amp; drop or click!</h3>
+			<!-- Place this tag where you want the button to render. -->
+
 			<div class="holder" style="float: left;"></div>
-			<input type="button" tabindex="1" name="fill" value="fill" onclick="avatar.fill()"><br>
-			<input type="button" tabindex="1" name="fit" value="fit" onclick="avatar.fit()"><br>
-			<input type="button" tabindex="1" name="center" value="center" onclick="avatar.center()"><br>
+			<input type="button" tabindex="1" name="fill" value="fill" onclick="avatar.fill().render()"><br>
+			<input type="button" tabindex="1" name="fit" value="fit" onclick="avatar.fit().render()"><br>
+			<input type="button" tabindex="1" name="center" value="center" onclick="avatar.center().render()"><br>
 			<input type="button" tabindex="1" name="clear" value="clear" onclick="avatar.clear()">
-		</div>
-		<div class="filters">
+		</section>
+		<section class="sections filters">
 			<h3>Apply a filter!</h3>
 			<div class="filter" tabindex="2" aria-label="greyscale" onclick="toggleFilter('greyscale')">
 				<div class="filter-holder" data-filter="greyscale"></div>
@@ -39,13 +47,13 @@
 				<div class="filter-holder" data-filter="vignette"></div>
 				<label for="vignette">Vignette</label>
 			</div>
-		</div>
-		<div class="main">
+		</section>
+		<section class="sections">
 			<h3>Save or use!</h3>
 			<a id="export" data-download="awesome-avatar.png">
 				<img />
 			</a>
-		</div>
+		</section>
 		<script type="text/javascript">
 			var avatar = new AvatarCrop( document.querySelector('.holder') ),
 					link = document.getElementById('export'),
@@ -54,9 +62,9 @@
 			function toggleFilter(name, conf) {
 				if (avatar.data) {
 					if (avatar.hasFilter(name)) {
-						avatar.removeFilter(name);
+						avatar.removeFilter(name).render();
 					} else {
-						avatar.addFilter(name, conf);
+						avatar.addFilter(name, conf).render();
 					}
 				}
 			}
@@ -87,7 +95,7 @@
 					if (data) {
 						av.setSource(data);
 						if (!avatar.hasFilter(name)) {
-							av.addFilter(name);
+							av.addFilter(name).render();
 							f.classList.remove('active');
 						} else {
 							f.classList.add('active');
@@ -110,5 +118,7 @@
 			avatar.addEventListener('change', updateFilters);
 			avatar.addEventListener('clear', updateFilters);
 		</script>
+		<!-- Place this tag right after the last button or just before your close body tag. -->
+		<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
 	</body>
 </html>

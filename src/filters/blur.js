@@ -47,14 +47,11 @@
 		this.next = null;
 	}
 
-	function stackBlurCanvasRGBA(canvas, top_x, top_y, width, height, radius) {
+	function stackBlurCanvasRGBA(imageData, top_x, top_y, width, height, radius) {
 		if (isNaN(radius) || radius < 1) return;
 		radius |= 0;
 
-		var context = canvas.getContext("2d");
-		var imageData = context.getImageData(top_x, top_y, width, height);
 		var pixels = imageData.data;
-
 		var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum,
 			r_out_sum, g_out_sum, b_out_sum, a_out_sum,
 			r_in_sum, g_in_sum, b_in_sum, a_in_sum,
@@ -272,12 +269,12 @@
 			}
 		}
 
-		context.putImageData(imageData, top_x, top_y);
+		return imageData;
 	}
 
-	AvatarCrop.registerFilter('blur', function(self, canvas) {
+	AvatarCrop.registerFilter('blur', function(self, imageData, canvas) {
 		var context = canvas.getContext('2d');
-		stackBlurCanvasRGBA(canvas, 0, 0, canvas.width, canvas.height, this.configs.radius);
+		return stackBlurCanvasRGBA(imageData, 0, 0, canvas.width, canvas.height, this.configs.radius);
 	}, {
 		radius: 5
 	});

@@ -1,7 +1,7 @@
 (function () {
 
-	AvatarCrop.execFilter = function(canvas, effects) {
-		var outerRadius, gradient, imageData,
+	AvatarCrop.execFilter = function(imageData, canvas, effects) {
+		var outerRadius, gradient,
 			ctx = canvas.getContext('2d'),
 			width = canvas.width,
 			height = canvas.height;
@@ -31,9 +31,6 @@
 			ctx.fillStyle = gradient;
 			ctx.fillRect(0, 0, width, height);
 		}
-
-		// get image data for pixel manipulation
-		imageData = ctx.getImageData(0, 0, width, height);
 
 		// temporary var for faster looping
 		var
@@ -131,7 +128,7 @@
 		}
 
 		// write image data, finalize vintageJS
-		ctx.putImageData(imageData, 0, 0);
+		return imageData;
 	}
 
 })(window);

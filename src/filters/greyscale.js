@@ -1,7 +1,7 @@
 (function () {
-	AvatarCrop.registerFilter('greyscale', function (self, canvas) {
-		AvatarCrop.execFilter(canvas, {
+	AvatarCrop.registerFilter('greyscale', function (self, imageData, canvas) {
+		return AvatarCrop.execFilter(imageData, canvas, {
 			desaturate: 1
-		})
+		});
 	});
 })();

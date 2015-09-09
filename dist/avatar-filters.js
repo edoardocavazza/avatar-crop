@@ -1,7 +1,7 @@
 (function () {
 
-	AvatarCrop.execFilter = function(canvas, effects) {
-		var outerRadius, gradient, imageData,
+	AvatarCrop.execFilter = function(imageData, canvas, effects) {
+		var outerRadius, gradient,
 			ctx = canvas.getContext('2d'),
 			width = canvas.width,
 			height = canvas.height;
@@ -31,9 +31,6 @@
 			ctx.fillStyle = gradient;
 			ctx.fillRect(0, 0, width, height);
 		}
-
-		// get image data for pixel manipulation
-		imageData = ctx.getImageData(0, 0, width, height);
 
 		// temporary var for faster looping
 		var
@@ -131,7 +128,7 @@
 		}
 
 		// write image data, finalize vintageJS
-		ctx.putImageData(imageData, 0, 0);
+		return imageData;
 	}
 
 })(window);
@@ -185,14 +182,11 @@
 		this.next = null;
 	}
 
-	function stackBlurCanvasRGBA(canvas, top_x, top_y, width, height, radius) {
+	function stackBlurCanvasRGBA(imageData, top_x, top_y, width, height, radius) {
 		if (isNaN(radius) || radius < 1) return;
 		radius |= 0;
 
-		var context = canvas.getContext("2d");
-		var imageData = context.getImageData(top_x, top_y, width, height);
 		var pixels = imageData.data;
-
 		var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum,
 			r_out_sum, g_out_sum, b_out_sum, a_out_sum,
 			r_in_sum, g_in_sum, b_in_sum, a_in_sum,
@@ -410,52 +404,61 @@
 			}
 		}
 
-		context.putImageData(imageData, top_x, top_y);
+		return imageData;
 	}
 
-	AvatarCrop.registerFilter('blur', function(self, canvas) {
+	AvatarCrop.registerFilter('blur', function(self, imageData, canvas) {
 		var context = canvas.getContext('2d');
-		stackBlurCanvasRGBA(canvas, 0, 0, canvas.width, canvas.height, this.configs.radius);
+		return stackBlurCanvasRGBA(imageData, 0, 0, canvas.width, canvas.height, this.configs.radius);
 	}, {
 		radius: 5
 	});
 })();
 
 (function () {
-	AvatarCrop.registerFilter('greyscale', function (self, canvas) {
-		AvatarCrop.execFilter(canvas, {
+	AvatarCrop.registerFilter('greyscale', function (self, imageData, canvas) {
+		return AvatarCrop.execFilter(imageData, canvas, {
 			desaturate: 1
-		})
+		});
 	});
 })();
 
 (function () {
-	AvatarCrop.registerFilter('negative', function (self, canvas) {
+	AvatarCrop.registerFilter('negative', function (self, imageData, canvas) {
 	    var context = canvas.getContext('2d');
-	    var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 	    var data = imageData.data;
 	    for (var i = 0; i < data.length; i += 4) {
 	        data[i]   = 255 - data[i];   // red
 	        data[i+1] = 255 - data[i+1]; // green
 	        data[i+2] = 255 - data[i+2]; // blue
 	    }
-	    context.putImageData(imageData, 0, 0);
+			return imageData;
 	});
 })();
 
 (function () {
-	AvatarCrop.registerFilter('sepia', function (self, canvas) {
-		AvatarCrop.execFilter(canvas, {
+	AvatarCrop.registerFilter('sepia', function (self, imageData, canvas) {
+		return AvatarCrop.execFilter(imageData, canvas, {
 			sepia: 1
-		})
+		});
 	});
 })();
 
 (function () {
-	AvatarCrop.registerFilter('vignette', function (self, canvas) {
-		AvatarCrop.execFilter(canvas, {
-			vignette: this.configs.radius
-		})
+	AvatarCrop.registerFilter('vignette', function (self, imageData, canvas) {
+		var ctx = canvas.getContext('2d'),
+				width = canvas.width,
+				height = canvas.height,
+				outerRadius = Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2));
+		ctx.putImageData(imageData, 0, 0);
+		ctx.globalCompositeOperation = 'source-over';
+		var gradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, outerRadius);
+		gradient.addColorStop(0, 'rgba(0,0,0,0)');
+		gradient.addColorStop(0.5, 'rgba(0,0,0,0)');
+		gradient.addColorStop(1, ['rgba(0,0,0,', this.configs.radius, ')'].join(''));
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, width, height);
+		return imageData = ctx.getImageData(0, 0, width, height);
 	}, {
 		radius: 0.16
 	});

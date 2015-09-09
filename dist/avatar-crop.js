@@ -50,8 +50,8 @@
     this.configs = defaults || {};
   }
 
-  AvatarCropFilter.prototype.exec = function(self, canvas) {
-    this.fn.call(this, self, canvas);
+  AvatarCropFilter.prototype.exec = function(self, data, canvas) {
+    return this.fn.call(this, self, data, canvas);
   }
 
   AvatarCropFilter.prototype.config = function(data) {
@@ -480,9 +480,11 @@
         ctx.drawImage(image, 0, 0, imageW, imageH, (canvas.width - canvas.width * zoom) / 2 - this._offsetX, (canvas.height - h * zoom) / 2 - this._offsetY, canvas.width * zoom, h * zoom);
       }
 
+      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       for (var i = 0, len = filters.length; i < len; i++) {
-        filters[i].exec(this, canvas);
+        imageData = filters[i].exec(this, imageData, canvas);
       }
+      ctx.putImageData(imageData, 0, 0);
       clearTimeout(self.fireTimeout);
       self.fireTimeout = setTimeout(function() {
         self.fire('change');

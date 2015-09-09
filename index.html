@@ -27,26 +27,6 @@
 		</section>
 		<section class="sections filters">
 			<h3>Apply a filter!</h3>
-			<div class="filter" tabindex="2" aria-label="greyscale" onclick="toggleFilter('greyscale')">
-				<div class="filter-holder" data-filter="greyscale"></div>
-				<label for="greyscale">Greyscale</label>
-			</div>
-			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('blur', { radius: avatar.canvas.width / 16 })">
-				<div class="filter-holder" data-filter="blur"></div>
-				<label for="blur">Blur</label>
-			</div>
-			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('negative')">
-				<div class="filter-holder" data-filter="negative"></div>
-				<label for="negative">Negative</label>
-			</div>
-			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('sepia')">
-				<div class="filter-holder" data-filter="sepia"></div>
-				<label for="sepia">Sepia</label>
-			</div>
-			<div class="filter" tabindex="2" aria-label="" onclick="toggleFilter('vignette')">
-				<div class="filter-holder" data-filter="vignette"></div>
-				<label for="vignette">Vignette</label>
-			</div>
 		</section>
 		<section class="sections">
 			<h3>Save or use!</h3>
@@ -56,6 +36,7 @@
 		</section>
 		<script type="text/javascript">
 			var avatar = new AvatarCrop( document.querySelector('.holder') ),
+					wrap = document.querySelector('.filters'),
 					link = document.getElementById('export'),
 					img = link.firstElementChild;
 
@@ -69,8 +50,17 @@
 				}
 			}
 
+			for (var k in AvatarCrop.filters) {
+				wrap.innerHTML += (
+					'<div class="filter" tabindex="2" aria-label="$FILTER" onclick="toggleFilter(\'$FILTER\')">' +
+						'<div class="filter-holder" data-filter="$FILTER"></div>' +
+						'<label for="$FILTER">$FILTER</label>' +
+					'</div>'
+				).replace(/\$FILTER/g, k);
+			}
+
 			var filters = document.querySelectorAll('.filter-holder'),
-				filterAvatars = [];
+					filterAvatars = [];
 
 			for (var i = 0, len = filters.length; i < len; i++) {
 				filterAvatars[i] = new AvatarCrop(filters[i], {

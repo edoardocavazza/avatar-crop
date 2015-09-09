@@ -24,6 +24,7 @@ h3 {
 	font-family: 'Damion', cursive;
 	font-size: 2em;
 	color: #F28B66;
+	margin: 0 0 1em 0;
 }
 
 input[type="button"] {
@@ -31,9 +32,9 @@ input[type="button"] {
 	background: rgba(255, 255, 255, 0.35);
 	padding: 0.5em 1em;
 	border: solid 1px #F28B66;
-	font-size: 1em;
+	font-size: 0.8em;
 	border-radius: 2px;
-	margin: 4px 8px;
+	margin: 2px 2px 2px 0;
 	cursor: pointer;
 	transition: all 250ms;
 	-webkit-transition: all 250ms;
@@ -52,7 +53,7 @@ input[type="button"]:active {
 }
 
 .sections {
-	margin: 0 auto 0.5em auto;
+	margin: 0 auto 0 auto;
 	width: 900px;
 	max-width: 100%;
 	position: relative;

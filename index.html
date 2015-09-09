@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Demo Avatar Crop</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<link href='https://fonts.googleapis.com/css?family=Damion' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="styles/style.css" charset="utf-8">
 		<script type="text/javascript" src="dist/avatar-crop.full.min.js"></script>
@@ -19,10 +20,10 @@
 			<h3>Drag &amp; drop or click!</h3>
 			<!-- Place this tag where you want the button to render. -->
 
-			<div class="holder" style="float: left;"></div>
-			<input type="button" tabindex="1" name="fill" value="fill" onclick="avatar.fill().render()"><br>
-			<input type="button" tabindex="1" name="fit" value="fit" onclick="avatar.fit().render()"><br>
-			<input type="button" tabindex="1" name="center" value="center" onclick="avatar.center().render()"><br>
+			<div class="holder"></div>
+			<input type="button" tabindex="1" name="fill" value="fill" onclick="avatar.fill().render()">
+			<input type="button" tabindex="1" name="fit" value="fit" onclick="avatar.fit().render()">
+			<input type="button" tabindex="1" name="center" value="center" onclick="avatar.center().render()">
 			<input type="button" tabindex="1" name="clear" value="clear" onclick="avatar.clear()">
 		</section>
 		<section class="sections filters">

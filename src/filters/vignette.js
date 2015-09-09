@@ -1,5 +1,5 @@
 (function () {
-	AvatarCrop.addFilter('vignette', function (self, canvas) {
+	AvatarCrop.registerFilter('vignette', function (self, canvas) {
 		AvatarCrop.execFilter(canvas, {
 			vignette: this.configs.radius
 		})

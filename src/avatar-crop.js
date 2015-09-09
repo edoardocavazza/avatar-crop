@@ -15,6 +15,24 @@
     return res;
   }
 
+  function bind(elem, evt, fn) {
+    elem.addEventListener(evt, fn, false);
+  }
+
+  function unbind(elem, evt) {
+    elem.removeEventListener(evt);
+  }
+
+  function createBoard() {
+    var c = document.createElement('canvas');
+    c.style.border = 'solid 1px #DDD';
+    c.style.backgroundColor = '#FFF';
+    c.style.backgroundImage = 'url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIzMnB4IiBoZWlnaHQ9IjMycHgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMzIgMzIiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxyZWN0IGZpbGw9IiNDQ0NDQ0MiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIvPjxyZWN0IHg9IjE2IiB5PSIxNiIgZmlsbD0iI0NDQ0NDQyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ii8+PC9zdmc+")';
+    c.style.userSelect = 'none';
+    c.style.webkitUserSelect = 'none';
+    return c;
+  }
+
   var defaults = {
     interactive: true,
     droppable: true,
@@ -47,13 +65,15 @@
       throw 'Missing element.';
     }
     var self = this;
-    this.canvas = AvatarCrop.createBoard();
+    this.canvas = createBoard();
     this._callbacks = {};
     this.filters = [];
     this.config(options);
     el.appendChild(this.canvas);
     this.clear();
   }
+
+  var proto = AvatarCrop.prototype;
 
   AvatarCrop.DEFAULT_WIDTH = 256;
   AvatarCrop.DEFAULT_HEIGHT = 256;
@@ -63,24 +83,14 @@
   AvatarCrop.filters = {};
   AvatarCrop.Filter = AvatarCropFilter;
 
-  AvatarCrop.addFilter = function(name, fn, config) {
+  AvatarCrop.registerFilter = function(name, fn, config) {
     AvatarCrop.filters[name] = {
       fn: fn,
       defaults: config
     }
   }
 
-  AvatarCrop.createBoard = function() {
-    var c = document.createElement('canvas');
-    c.style.border = 'solid 1px #DDD';
-    c.style.backgroundColor = '#FFF';
-    c.style.backgroundImage = 'url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIzMnB4IiBoZWlnaHQ9IjMycHgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMzIgMzIiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxyZWN0IGZpbGw9IiNDQ0NDQ0MiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIvPjxyZWN0IHg9IjE2IiB5PSIxNiIgZmlsbD0iI0NDQ0NDQyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ii8+PC9zdmc+")';
-    c.style.userSelect = 'none';
-    c.style.webkitUserSelect = 'none';
-    return c;
-  }
-
-  AvatarCrop.prototype.config = function(options) {
+  proto.config = function(options) {
     var old = clone(this.options || {});
     var opt = this.options || clone(defaults);
     if (options) {
@@ -112,19 +122,19 @@
     this.options = opt;
   }
 
-  AvatarCrop.prototype.addEventListener = function(name, fn) {
+  proto.addEventListener = function(name, fn) {
     this._callbacks[name] = this._callbacks[name] || [];
     this._callbacks[name].push(fn);
   }
 
-  AvatarCrop.prototype.fire = function(evt) {
+  proto.fire = function(evt) {
     var clbs = this._callbacks[evt] || [];
     for (var i = 0, len = clbs.length; i < len; i++) {
       clbs[i].apply(this);
     }
   }
 
-  AvatarCrop.prototype.bindInteractive = function() {
+  proto.bindInteractive = function() {
     var self = this,
         canvas = this.canvas,
         ctx = canvas.getContext('2d'),
@@ -147,7 +157,7 @@
 
     function handleMouseMove(e) {
       if (isDragging) {
-        self.move(e.clientX - canMouseX, e.clientY - canMouseY);
+        self.move(e.clientX - canMouseX, e.clientY - canMouseY, 1);
       }
     }
 
@@ -157,7 +167,7 @@
         e.stopPropagation();
         e.preventDefault();
         var delta = -(e.detail ? e.detail * (-120) : e.wheelDelta) / AvatarCrop.DEFAULT_WHEEL_FACTOR;
-        self.zoom(self._zoom + delta);
+        self.zoom(self._zoom + delta, 1);
         wheel = delta;
         return false;
       }
@@ -180,31 +190,31 @@
       }
     }
 
-    canvas.addEventListener('mousedown', handleMouseDown, false);
-    canvas.addEventListener('mousemove', handleMouseMove, false);
-    canvas.addEventListener('mouseup', handleMouseUp, false);
-    canvas.addEventListener('mouseout', handleMouseUp, false);
-    canvas.addEventListener('dblclick', handleDblClick, false);
-    canvas.addEventListener('mousewheel', handleMouseWheel, false);
-    canvas.addEventListener('DOMMouseScroll', handleMouseWheel, false);
+    bind(canvas, 'mousedown', handleMouseDown);
+    bind(canvas, 'mousemove', handleMouseMove);
+    bind(canvas, 'mouseup', handleMouseUp);
+    bind(canvas, 'mouseout', handleMouseUp);
+    bind(canvas, 'dblclick', handleDblClick);
+    bind(canvas, 'mousewheel', handleMouseWheel);
+    bind(canvas, 'DOMMouseScroll', handleMouseWheel);
   }
 
-  AvatarCrop.prototype.unbindInteractive = function() {
+  proto.unbindInteractive = function() {
     var canvas = this.canvas;
-    canvas.removeEventListener('mousedown');
-    canvas.removeEventListener('mousemove');
-    canvas.removeEventListener('mouseup');
-    canvas.removeEventListener('mouseout');
-    canvas.removeEventListener('dblclick');
-    canvas.removeEventListener('mousewheel');
-    canvas.removeEventListener('DOMMouseScroll');
+    unbind(canvas, 'mousedown');
+    unbind(canvas, 'mousemove');
+    unbind(canvas, 'mouseup');
+    unbind(canvas, 'mouseout');
+    unbind(canvas, 'dblclick');
+    unbind(canvas, 'mousewheel');
+    unbind(canvas, 'DOMMouseScroll');
   }
 
-  AvatarCrop.prototype.bindDroppable = function() {
+  proto.bindDroppable = function() {
     var self = this,
         canvas = this.canvas;
     if (typeof FileReader !== 'undefined') {
-      canvas.addEventListener('drop', function(e) {
+      bind(canvas, 'drop', function(e) {
         e.preventDefault();
         var files = e.dataTransfer.files;
         if (files.length > 0) {
@@ -212,22 +222,22 @@
         }
       });
 
-      canvas.addEventListener('dragover', function(e) {
+      bind(canvas, 'dragover', function(e) {
         e.preventDefault();
-      }, false);
+      });
     }
   }
 
-  AvatarCrop.prototype.unbindDroppable = function() {
+  proto.unbindDroppable = function() {
     var canvas = this.canvas;
-    canvas.removeEventListener('dragover');
-    canvas.removeEventListener('drop');
+    unbind(canvas, 'dragover');
+    unbind(canvas, 'drop');
   }
 
-  AvatarCrop.prototype.bindSelectable = function () {
+  proto.bindSelectable = function () {
     var self = this,
         canvas = this.canvas;
-    canvas.addEventListener('click', function(e) {
+    bind(canvas, 'click', function(e) {
       if (!self.data) {
         var input = document.createElement('input');
         input.type = 'file';
@@ -237,7 +247,7 @@
         ev.initEvent('click', true, true);
         ev.synthetic = true;
 
-        input.addEventListener('change', function(fileEv) {
+        bind(input, 'change', function(fileEv) {
           if (this.files && this.files[0]) {
             self.handleFile(this.files[0]);
           }
@@ -256,12 +266,11 @@
     });
   }
 
-  AvatarCrop.prototype.unbindSelectable = function() {
-    var canvas = this.canvas;
-    canvas.removeEventListener('click');
+  proto.unbindSelectable = function() {
+    unbind(this.canvas, 'click');
   }
 
-  AvatarCrop.prototype.setLoadState = function(load) {
+  proto.setLoadState = function(load) {
     var self = this,
       start = Date.now(),
       lines = 16,
@@ -303,7 +312,7 @@
     }
   }
 
-  AvatarCrop.prototype.handleFile = function(file) {
+  proto.handleFile = function(file) {
     if (file.type.indexOf('image') !== -1) {
       var self = this,
         reader = new FileReader();
@@ -320,7 +329,7 @@
     }
   }
 
-  AvatarCrop.prototype.setSource = function(data) {
+  proto.setSource = function(data) {
     var self = this,
       canvas = this.canvas,
       image = new Image();
@@ -343,11 +352,11 @@
     image.src = data;
   }
 
-  AvatarCrop.prototype.fit = function(durate) {
-    this.moveAndZoom(0, 0, 1, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
+  proto.fit = function(durate) {
+    return this.moveAndZoom(0, 0, 1, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
   }
 
-  AvatarCrop.prototype.fill = function(durate) {
+  proto.fill = function(durate) {
     if (this.data) {
       var image = this.data,
         imageW = image.width,
@@ -358,19 +367,20 @@
         this.moveAndZoom(0, 0, imageW / imageH, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
       }
     }
+    return this;
   }
 
-  AvatarCrop.prototype.move = function(x, y, durate) {
-    this.moveAndZoom(x, y, this._zoom, durate);
+  proto.move = function(x, y, durate) {
+    return this.moveAndZoom(x, y, this._zoom, durate);
   }
 
-  AvatarCrop.prototype.zoom = function(zoom, durate) {
+  proto.zoom = function(zoom, durate) {
     var x = (-this._offsetX / this._zoom) * zoom,
       y = (-this._offsetY / this._zoom) * zoom;
-    this.moveAndZoom(x, y, zoom, durate);
+    return this.moveAndZoom(x, y, zoom, durate);
   }
 
-  AvatarCrop.prototype.moveAndZoom = function(x, y, zoom, durate) {
+  proto.moveAndZoom = function(x, y, zoom, durate) {
     if (this.data) {
       durate = durate || 0;
       x = -x;
@@ -392,10 +402,12 @@
         self._offsetX = xTmp;
         self._offsetY = yTmp;
         self._zoom = zoomTmp;
-        self.render();
+        if (durate) {
+            self.render();
+        }
       }
 
-      if (durate) {
+      if (durate && durate !== 1) {
         var animate = function() {
           myRequestAnimFrame(function() {
             var time = Date.now(),
@@ -416,19 +428,21 @@
         setVals(x, y, zoom);
       }
     }
+    return this;
   }
 
-  AvatarCrop.prototype.reset = function(durate) {
+  proto.reset = function(durate) {
     if (typeof this[AvatarCrop.DEFAULT_MODE] == 'function') {
       this[AvatarCrop.DEFAULT_MODE].call(this, durate);
     }
+    return this;
   }
 
-  AvatarCrop.prototype.center = function(durate) {
-    this.moveAndZoom(0, 0, this._zoom, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
+  proto.center = function(durate) {
+    return this.moveAndZoom(0, 0, this._zoom, durate || AvatarCrop.DEFAULT_ANIM_DURATE);
   }
 
-  AvatarCrop.prototype.clear = function() {
+  proto.clear = function() {
     this.filters = [];
     this._offsetX = 0;
     this._offsetY = 0;
@@ -445,7 +459,7 @@
     this.fire('clear');
   }
 
-  AvatarCrop.prototype.render = function() {
+  proto.render = function() {
     if (this.data) {
       var self = this,
         image = this.data,
@@ -477,13 +491,13 @@
     }
   }
 
-  AvatarCrop.prototype.save = function() {
+  proto.save = function() {
     if (this.data) {
       return this.canvas.toDataURL();
     }
   }
 
-  AvatarCrop.prototype.hasFilter = function(name) {
+  proto.hasFilter = function(name) {
     var filters = this.filters;
     for (var i = 0, len = filters.length; i < len; i++) {
       if (filters[i].name == name) {
@@ -493,13 +507,12 @@
     return false;
   }
 
-  AvatarCrop.prototype.addFilter = function(name, fn) {
+  proto.addFilter = function(name, fn) {
     if (this.hasFilter(name)) {
-      return;
+      return this;
     }
     if (typeof fn == 'function') {
       this.filters.push(new AvatarCrop.Filter(name, fn));
-      this.render();
     } else if (AvatarCrop.filters[name]) {
       var filterDef = AvatarCrop.filters[name],
         filter = new AvatarCrop.Filter(name, filterDef.fn, filterDef.defaults);
@@ -507,32 +520,32 @@
         filter.config(fn);
       }
       this.filters.push(filter);
-      this.render();
     }
+    return this;
   }
 
-  AvatarCrop.prototype.removeFilter = function(name) {
+  proto.removeFilter = function(name) {
     var filters = this.filters;
     for (var i = 0, len = filters.length; i < filters.length; i++) {
       if (filters[i].name == name) {
         this.filters.splice(i, 1);
-        this.render();
-        return true;
+        return this;
       }
     }
+    return this;
   }
 
-  AvatarCrop.prototype.removeAllFilters = function() {
+  proto.removeAllFilters = function() {
     this.filters = [];
-    this.render();
+    return this;
   }
 
-  AvatarCrop.prototype.updateFilter = function(name, options) {
+  proto.updateFilter = function(name, options) {
     var filters = this.filters;
     for (var i = 0, len = filters.length; i < filters.length; i++) {
       if (filters[i].name == name) {
         filters[i].config(options);
-        this.render();
+        return this;
       }
     }
   }

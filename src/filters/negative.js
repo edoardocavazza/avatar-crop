@@ -1,5 +1,5 @@
 (function () {
-	AvatarCrop.addFilter('negative', function (self, canvas) {
+	AvatarCrop.registerFilter('negative', function (self, canvas) {
 	    var context = canvas.getContext('2d');
 	    var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 	    var data = imageData.data;
